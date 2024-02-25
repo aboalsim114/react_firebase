@@ -7,6 +7,8 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Navbar from "../components/Navbar"
+
+
 export default function Connexion() {
     const navigate = useNavigate();
 
@@ -45,7 +47,7 @@ export default function Connexion() {
             <Navbar />
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <Grid item xs={false} sm={4} md={7} sx={{
-                    backgroundImage: 'url(https://files.oaiusercontent.com/file-aQkTkqaTdNFgGuPbR7gn3FLP?se=2024-02-23T18%3A28%3A51Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3D68a5a577-dd55-4fd0-837d-62cdfa501d78.webp&sig=uGhvL%2BGxz49T5JdsFCxCkb5v8x21JUcKqsYX9hLlJSQ%3D)',
+                    backgroundImage: 'url(https://files.oaiusercontent.com/file-4DIn6ItYypnO18GcWcIzCVRh?se=2024-02-25T11%3A10%3A10Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3D3ac346bf-cecb-496c-a837-cb9f816feb53.webp&sig=hDQIN1Je9HQlU3EpPGosG7xgWFFKgdwrYWXiC6JVtSc%3D)',
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',

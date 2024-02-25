@@ -87,7 +87,7 @@ export default function FormAddFile() {
                             </Button>
                             {file && <Typography>Fichier sélectionné : {file.name}</Typography>}
                             <TextField
-                                label="Partager avec (email)"
+                                label="Partager avec (username)"
                                 variant="outlined"
                                 fullWidth
                                 value={shareWithEmail}
