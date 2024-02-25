@@ -11,12 +11,15 @@ import AddNote from './pages/AddNote';
 import ModifyNote from './pages/ModifyNote';
 import FormAddFile from './components/FormAddFile';
 import { ThemeProvider } from './context/ThemeContext';
+import { Navigate } from 'react-router-dom';
 
 const router = createBrowserRouter(
 
   createRoutesFromElements(
 
     <Route path='/' element={<App />}>
+      <Route index element={<Navigate replace to="/connexion" />} />
+
       <Route path='inscription' element={<Inscription />} />
       <Route path='connexion' element={<Connexion />} />
       <Route element={<Protected />} >
