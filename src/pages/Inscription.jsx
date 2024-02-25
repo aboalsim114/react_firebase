@@ -46,13 +46,15 @@ const Inscription = () => {
             const response = await createUserWithEmailAndPassword(auth, email, mdp);
             setValidation("");
 
-
+            const role = email.endsWith('@firecollab.com') ? 'admin' : 'user';
 
             //localStorage.setItem("user", JSON.stringify(response.user));
 
             const userDetails = {
                 "name": name,
                 "username": username,
+                role: role, // Include the role in the user details
+                ...(firstName && { firstName: firstName }),
             }
 
             if (firstName !== "") {
@@ -97,7 +99,7 @@ const Inscription = () => {
             <Grid container component="main" sx={{ height: '100vh' }}>
                 <CssBaseline />
                 <Grid item xs={false} sm={6} sx={{
-                    backgroundImage: 'url(https://files.oaiusercontent.com/file-aQkTkqaTdNFgGuPbR7gn3FLP?se=2024-02-23T18%3A28%3A51Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3D68a5a577-dd55-4fd0-837d-62cdfa501d78.webp&sig=uGhvL%2BGxz49T5JdsFCxCkb5v8x21JUcKqsYX9hLlJSQ%3D)', // Replace with your image path
+                    backgroundImage: 'url(https://files.oaiusercontent.com/file-4DIn6ItYypnO18GcWcIzCVRh?se=2024-02-25T11%3A10%3A10Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3D3ac346bf-cecb-496c-a837-cb9f816feb53.webp&sig=hDQIN1Je9HQlU3EpPGosG7xgWFFKgdwrYWXiC6JVtSc%3D)', // Replace with your image path
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                 }} />
@@ -107,6 +109,7 @@ const Inscription = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: '#fff',
+                    bgcolor: '#ffff',
 
                 }}>
                     <Paper elevation={6} sx={{
