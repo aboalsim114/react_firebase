@@ -1,13 +1,21 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-// import { auth } from '../config/firebase';
 
-const Protected = () => {
+const Protected = ({ children }) => {
+  const [auth, setAuth] = useState(null);
+
+  useEffect(() => {
     const user = localStorage.getItem("user");
-    // const user = auth.currentUser
-  return (
-    user ? <Outlet/> : <Navigate to="/connexion" />
-  )
-}
 
-export default Protected
+    setAuth(!!user);
+  }, []);
+
+  if (auth === null) {
+    return null;
+  }
+
+  return auth ? <Outlet /> : <Navigate to="/connexion" />;
+
+};
+
+export default Protected;

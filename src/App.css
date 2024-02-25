@@ -1,0 +1,26 @@
+:root {
+    --primary-text-color-light: #222;
+    --primary-text-color-dark: #fff;
+    --background-color-light: #fff;
+    --background-color-dark: #222;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    background-color: var(--background-color-light);
+    color: var(--primary-text-color-light);
+}
+
+body.dark {
+    background-color: var(--background-color-dark);
+    color: var(--primary-text-color-dark);
+}
+
+
+
+body.dark .MuiIconButton-root {
+    color: var(--primary-text-color-dark);
+}

@@ -1,132 +1,123 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import React, { useEffect, useState } from 'react'
 import { auth } from '../config/firebase';
-import { useNavigate, Link } from 'react-router-dom';
-
-const Connexion = () => {
-
-
-
-
-
-    const [email, setEmail] = useState("");
-    const [mdp, setMdp] = useState("");
-    const [validation, setValidation] = useState("");
-
+import { Grid, Paper, Box, Avatar, Typography, TextField, Button, Link } from '@mui/material';
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import { useFormik } from 'formik';
+import * as Yup from 'yup';
+import Navbar from "../components/Navbar"
+export default function Connexion() {
     const navigate = useNavigate();
 
-    const handleForm = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await signInWithEmailAndPassword(auth, email, mdp);
-            // await signInWithEmailAndPassword(auth, email, mdp);
-            setValidation("");
+    const validationSchema = Yup.object({
+        email: Yup.string()
+            .email('Entrez une adresse email valide')
+            .required('Le champ email est requis'),
+        password: Yup.string()
+            .min(6, 'Le mot de passe doit contenir au moins 6 caractères')
+            .required('Le champ mot de passe est requis'),
+    });
 
-
-            console.log("connection");
-            console.log(auth);
-
-            localStorage.setItem("user", response.user.uid)
-            //localStorage.setItem("user", JSON.stringify(response.user));
-            //navigate("/");
-        } catch (error) {
-            if(error.code === "auth/invalid-credential") {
-                setValidation("Email ou mot de passe incorrecte")
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+            password: '',
+        },
+        validationSchema: validationSchema,
+        onSubmit: async (values) => {
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, values.email, values.password);
+                if (userCredential.user) {
+                    console.log(userCredential.user);
+                    localStorage.setItem("user", JSON.stringify(userCredential.user));
+                    navigate('/profile');
+                }
+            } catch (error) {
+                console.error('Error signing in with email and password', error);
+                formik.setFieldError('general', error.message);
             }
-            //console.error(error);
-        }
-    }
-
-
-    useEffect( ()=>{
-
-        // const user = localStorage.getItem("user");
-        // if(user){
-        //     navigate("/");
-        // }
-
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-            if (user) {
-
-                navigate("/");
-            }
-          });
-          return () => unsubscribe();
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-
+        },
+    });
 
     return (
         <>
-        <div className="position-fixed vh-100 vw-100 top-0">
-            <div className="w-100 h-100 bg-dark bg-opacity-75">
-            </div>
+            <Navbar />
+            <Grid container component="main" sx={{ height: '100vh' }}>
+                <Grid item xs={false} sm={4} md={7} sx={{
+                    backgroundImage: 'url(https://files.oaiusercontent.com/file-aQkTkqaTdNFgGuPbR7gn3FLP?se=2024-02-23T18%3A28%3A51Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3D68a5a577-dd55-4fd0-837d-62cdfa501d78.webp&sig=uGhvL%2BGxz49T5JdsFCxCkb5v8x21JUcKqsYX9hLlJSQ%3D)',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }} />
+                <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+                    <Box
+                        sx={{
+                            my: 8,
+                            mx: 4,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            height: 'calc(100vh - 64px)',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <Avatar sx={{ m: 1, bgcolor: 'rgb(204, 10, 16)' }}>
+                            <LockOutlinedIcon />
+                        </Avatar>
+                        <Typography component="h1" variant="h5">
+                            Connexion
+                        </Typography>
+                        <Box component="form" noValidate onSubmit={formik.handleSubmit} sx={{ mt: 1 }}>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="email"
+                                label="Adresse Email"
+                                name="email"
+                                autoComplete="email"
+                                autoFocus
+                                value={formik.values.email}
+                                onChange={formik.handleChange}
+                                error={formik.touched.email && Boolean(formik.errors.email)}
+                                helperText={formik.touched.email && formik.errors.email}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password"
+                                label="Mot de Passe"
+                                type="password"
+                                id="password"
+                                autoComplete="current-password"
+                                value={formik.values.password}
+                                onChange={formik.handleChange}
+                                error={formik.touched.password && Boolean(formik.errors.password)}
+                                helperText={formik.touched.password && formik.errors.password}
+                            />
+                            {formik.errors.general && <Typography color="error" variant="body2">{formik.errors.general}</Typography>}
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
 
-            <div
-                 className="position-absolute top-50 start-50 translate-middle"
-                 style={{ minWidth: "400px" }}>
-                     <div className="modal position-static d-block">
-                        <div className="modal-dialog">
-                            <div className="modal-content">
-
-                                <div className="modal-header">
-                                    <h5 className="modal-title ">
-                                        Se Connecter
-                                    </h5>
-                                </div>
-
-                                <div className="modal-body">
-                                    <p className="text-danger mt-1 text-center"> {validation}</p>
-                                    <form
-                                     onSubmit={handleForm}
-                                     className="signup-form">
-                                        <div className="mb-3">
-                                            <label className='form-label' htmlFor="signupEmail">Email</label>
-
-                                            <input
-                                            type='email'
-                                            name='email'
-                                            className='form-control'
-                                            id='signupEmail'
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            required />
-
-
-                                        </div>
-                                        <div className="mb-3">
-
-                                            <label className='form-label' htmlFor="signupMdp">Mot de passe</label>
-
-                                            <input
-                                            type='password'
-                                            name='mdp'
-                                            className='form-control'
-                                            id='signupMdp'
-                                            onChange={(e) => setMdp(e.target.value)}
-                                            required />
-
-
-                                        </div>
-
-
-
-                                        <button type='submit' className="btn btn-primary">Se connecter</button>
-                                    </form>
-
-                                </div>
-                                <div className="text-center mt-3">
-                                    <p>Nouveau ici ? <Link to="/inscription">S'inscrire</Link></p>
-                                </div>
-                            </div>
-                        </div>
-                     </div>
-
-            </div>
-        </div>
+                                sx={{ mt: 3, mb: 2, bgcolor: 'rgb(204, 10, 16)' }}
+                            >
+                                Se connecter
+                            </Button>
+                            <Grid container justifyContent="flex-end">
+                                <Grid item>
+                                    <Link href="/inscription" variant="body2">
+                                        {"Vous n'avez pas de compte? S'inscrire"}
+                                    </Link>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Box>
+                </Grid>
+            </Grid>
         </>
-      )
+    );
 }
-
-export default Connexion

@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react'
-import { createUserWithEmailAndPassword,signOut } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signOut } from 'firebase/auth'
 import { auth } from '../config/firebase';
 import { useNavigate, Link } from 'react-router-dom';
 import { crudUser } from '../hooks/crudUser';
-
-
+import {
+    Container, Typography, TextField, Button,
+    Box, Grid, CssBaseline, Paper
+} from '@mui/material';
+import Navbar from '../components/Navbar';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from '../config/firebase'
 
 const Inscription = () => {
 
 
     const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
     const [mdp, setMdp] = useState("");
     const [repMdp, setRepMdp] = useState("");
     const [name, setName] = useState("");
@@ -18,14 +24,20 @@ const Inscription = () => {
     const [validation, setValidation] = useState("");
 
 
+    const uploadImageProfileFunction = async (uid, file) => {
+        const storageRef = ref(storage, `profileImages/${uid}/${file.name}`);
+        await uploadBytes(storageRef, file);
+        return getDownloadURL(storageRef);
+    };
+
 
     const navigate = useNavigate();
-    const {addUserDetails, uploadImageProfile} = crudUser();
+    const { addUserDetails, uploadImageProfile } = crudUser();
 
     const handleForm = async (e) => {
         e.preventDefault();
 
-        if(mdp !== repMdp){
+        if (mdp !== repMdp) {
             setValidation("Confirmation de mot de passe incorrecte");
             return;
         }
@@ -39,19 +51,21 @@ const Inscription = () => {
             //localStorage.setItem("user", JSON.stringify(response.user));
 
             const userDetails = {
-                "name": name
+                "name": name,
+                "username": username,
             }
 
-            if(firstName !==""){
+            if (firstName !== "") {
                 userDetails["firstName"] = firstName;
             }
+
 
 
             await addUserDetails(response.user.uid, userDetails);
 
 
 
-            if(fileUpload){
+            if (fileUpload) {
                 await uploadImageProfile(response.user.uid, fileUpload)
             }
 
@@ -64,7 +78,7 @@ const Inscription = () => {
 
             // navigate("/connexion");
         } catch (error) {
-            if(error.code === "auth/email-already-in-use") {
+            if (error.code === "auth/email-already-in-use") {
                 setValidation("email déjà utilisé")
             }
             //console.error(error);
@@ -74,147 +88,142 @@ const Inscription = () => {
     }
 
 
-    useEffect( ()=>{
-
-        // const user = localStorage.getItem("user");
-        // if(user){
-        //     navigate("/");
-        // }
-
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-            if (user) {
-                navigate("/");
-            }
-          });
-          return () => unsubscribe();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-  return (
-    <>
-    <div className="position-fixed vh-100 vw-100 top-0">
-        <div className="w-100 h-100 bg-dark bg-opacity-75">
-        </div>
-
-        <div
-             className="position-absolute top-50 start-50 translate-middle"
-             style={{ minWidth: "400px" }}>
-                 <div className="modal position-static d-block">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-
-                            <div className="modal-header">
-                                <h5 className="modal-title ">
-                                    S'inscrire
-                                </h5>
-                            </div>
-
-                            <div className="modal-body">
-                                <p className="text-danger mt-1 text-center"> {validation}</p>
-                                <form
-                                 onSubmit={handleForm}
-                                 className="signup-form">
-                                    <div className="mb-3">
-                                        <label className='form-label' htmlFor="signupEmail">Email</label>
-
-                                        <input
-                                        type='email'
-                                        name='email'
-                                        className='form-control'
-                                        id='signupEmail'
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required />
 
 
-                                    </div>
-                                    <div className="mb-3">
+    return (
+        <>
+            <Navbar />
 
-                                        <label className='form-label' htmlFor="signupMdp">Mot de passe</label>
+            <Grid container component="main" sx={{ height: '100vh' }}>
+                <CssBaseline />
+                <Grid item xs={false} sm={6} sx={{
+                    backgroundImage: 'url(https://files.oaiusercontent.com/file-aQkTkqaTdNFgGuPbR7gn3FLP?se=2024-02-23T18%3A28%3A51Z&sp=r&sv=2021-08-06&sr=b&rscc=max-age%3D31536000%2C%20immutable&rscd=attachment%3B%20filename%3D68a5a577-dd55-4fd0-837d-62cdfa501d78.webp&sig=uGhvL%2BGxz49T5JdsFCxCkb5v8x21JUcKqsYX9hLlJSQ%3D)', // Replace with your image path
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                }} />
+                <Grid item xs={12} sm={6} sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
 
-                                        <input
-                                        type='password'
-                                        name='mdp'
-                                        className='form-control'
-                                        id='signupMdp'
-                                        onChange={(e) => setMdp(e.target.value)}
-                                        required />
+                }}>
+                    <Paper elevation={6} sx={{
+                        width: 'auto',
+                        height: 'auto',
+                        margin: (theme) => theme.spacing(8, 4),
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        padding: (theme) => theme.spacing(2),
 
+                    }}>
+                        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
+                            S'inscrire
+                        </Typography>
+                        <Box component="form" noValidate onSubmit={handleForm} sx={{ mt: 1 }}>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="email"
+                                label="Adresse Email"
+                                name="email"
+                                autoComplete="email"
+                                autoFocus
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
 
-                                    </div>
-
-                                    <div className="mb-3">
-
-                                        <label className='form-label' htmlFor="signupMdpRep">Répéter le mot de passe</label>
-
-                                        <input
-                                        type='password'
-                                        name='mdpRep'
-                                        className='form-control'
-                                        id='signupMdpRep'
-                                        onChange={(e) => setRepMdp(e.target.value)}
-                                        required />
-
-
-                                    </div>
-
-                                    <div className="mb-3">
-
-                                        <label className='form-label' htmlFor="signupName">Nom</label>
-
-                                        <input
-                                        type='text'
-                                        name='name'
-                                        className='form-control'
-                                        id='signupName'
-                                        onChange={(e) => setName(e.target.value)}
-                                        required />
-
-
-                                    </div>
-
-                                    <div className="mb-3">
-
-                                        <label className='form-label' htmlFor="signupFirstName">Prénom</label>
-
-                                        <input
-                                        type='text'
-                                        name='firstname'
-                                        className='form-control'
-                                        id='signupFirstName'
-                                        onChange={(e) => setFirstName(e.target.value)}
-                                         />
-
-
-                                    </div>
-
-                                    <div className="mb-3">
-
-                                        <label className='form-label' htmlFor='profilPhoto'>Photo de profil</label>
-
-                                        <input
-                                        type='file'
-                                        className="form-control"
-                                        id='profilPhoto'
-                                        onChange={(e) => setFileUpload(e.target.files[0])}/>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="username"
+                                label="username"
+                                name="username"
+                                autoFocus
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
 
 
-                                    </div>
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="password"
+                                label="Mot de passe"
+                                type="password"
+                                id="password"
+                                autoComplete="current-password"
+                                value={mdp}
+                                onChange={(e) => setMdp(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                name="confirmPassword"
+                                label="Confirmez le mot de passe"
+                                type="password"
+                                id="confirmPassword"
+                                value={repMdp}
+                                onChange={(e) => setRepMdp(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                required
+                                fullWidth
+                                id="name"
+                                label="Nom"
+                                name="name"
+                                autoComplete="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                            <TextField
+                                margin="normal"
+                                fullWidth
+                                id="firstName"
+                                label="Prénom"
+                                name="firstName"
+                                autoComplete="firstName"
+                                value={firstName}
+                                onChange={(e) => setFirstName(e.target.value)}
+                            />
+                            <TextField
+                                type="file"
+                                onChange={(e) => setFileUpload(e.target.files[0])}
+                                inputProps={{
+                                    accept: "image/*"
+                                }}
+                                fullWidth
+                                margin="normal"
+                            />
 
-                                    <button type='submit' className="btn btn-primary">S'inscrire</button>
-                                </form>
-
-                            </div>
-                            <div className="text-center mt-3">
-                                <p>Déjà inscrit ? <Link to="/connexion">Se connecter</Link></p>
-                            </div>
-                        </div>
-                    </div>
-                 </div>
-
-        </div>
-    </div>
-    </>
-  )
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                sx={{ mt: 3, mb: 2, backgroundColor: 'red', color: 'white' }}
+                            >
+                                S'inscrire
+                            </Button>
+                            <Grid container justifyContent="flex-end">
+                                <Grid item>
+                                    <Link to="/connexion" style={{ color: 'red', textDecoration: 'none' }}>
+                                        Déjà inscrit ? Se connecter
+                                    </Link>
+                                </Grid>
+                            </Grid>
+                        </Box>
+                    </Paper>
+                </Grid>
+            </Grid>
+        </>
+    )
 }
 
 export default Inscription
