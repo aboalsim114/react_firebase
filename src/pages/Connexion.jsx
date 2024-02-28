@@ -104,7 +104,7 @@ export default function Connexion() {
                                 type="submit"
                                 fullWidth
                                 variant="contained"
-
+                                disabled={formik.values.email.length === 0 || formik.values.password.length === 0}
                                 sx={{ mt: 3, mb: 2, bgcolor: 'rgb(204, 10, 16)' }}
                             >
                                 Se connecter
